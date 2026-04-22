@@ -6,7 +6,7 @@
         在此页面启动tcpdump抓包进程，并管理已捕获的数据包文件(.pcap)。捕获的文件存储在临时文件系统中，重启后会丢失。适用于OpenWrt24.10.
     </div>
 
-    <%-- 动态状态显示区域，参考KSpeeder示例 --%>
+    <!-- <%-- 动态状态显示区域 --%> -->
     <script type="text/javascript">//<![CDATA[
         XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "network", "tcpdump")%>/update', null,
             function(x, status) {
@@ -21,12 +21,13 @@
             }
         );
     //]]></script>
+    
     <fieldset class="cbi-section">
         <legend><%:抓包状态%></legend>
         <p id="tcpdump_status"><br><em style="color:blue">⏸️ 抓包已停止</em></p>
     </fieldset>
 
-    <%-- 抓包控制面板（非表格形式） --%>
+    <!-- <%-- 抓包控制面板 --%> -->
     <fieldset class="cbi-section">
         <legend><%:启动新的抓包任务%></legend>
         <div class="cbi-section-descr" style="margin-bottom: 20px;">
@@ -34,7 +35,7 @@
         </div>
         
         <div class="cbi-section-node">
-            <%-- 网络接口设置 --%>
+            <!-- <%-- 网络接口设置 --%> -->
             <div class="cbi-value">
                 <label class="cbi-value-title" for="cap_ifname"><%:网络接口%></label>
                 <div class="cbi-value-field">
@@ -59,7 +60,7 @@
                 </div>
             </div>
             
-            <%-- 停止条件设置 --%>
+            <!-- <%-- 停止条件设置 --%> -->
             <div class="cbi-value">
                 <label class="cbi-value-title" for="cap_stop_value"><%:停止条件%></label>
                 <div class="cbi-value-field">
@@ -81,7 +82,7 @@
                 </div>
             </div>
             
-            <%-- BPF过滤规则设置 --%>
+            <!-- <%-- BPF过滤规则设置 --%> -->
             <div class="cbi-value">
                 <label class="cbi-value-title" for="cap_filter"><%:BPF过滤规则%></label>
                 <div class="cbi-value-field">
@@ -100,7 +101,7 @@
                 </div>
             </div>
             
-            <%-- 操作按钮区域 --%>
+            <!-- <%-- 操作按钮区域 --%> -->
             <div class="cbi-value cbi-value-last">
                 <div class="cbi-value-field">
                     <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px;">
@@ -142,7 +143,7 @@
         </div>
     </fieldset>
 
-    <%-- 实时输出日志 (仅在抓包时显示) --%>
+    <!-- <%-- 实时输出日志 (仅在抓包时显示) --%> -->
     <fieldset class="cbi-section" id="log_section" style="display:none;">
         <legend><%:实时抓包日志%></legend>
         <div class="cbi-section-node">
@@ -192,7 +193,7 @@
 
     <hr />
 
-    <%-- 捕获文件列表（保留表格形式）--%>
+    <!-- <%-- 捕获文件列表--%> -->
     <fieldset class="cbi-section">
         <legend><%:已保存的捕获文件%></legend>
         <div class="cbi-section-descr">
@@ -224,11 +225,11 @@
                         <td>
                             <div style="display: flex; gap: 8px;">
                                 <button type="button" class="btn cbi-button cbi-button-download" 
-                                        onclick="capture_get('all')" style="flex: 1;">
+                                        onclick="downloadAll()" style="flex: 1;">
                                     <%:下载全部 (.tar)%>
                                 </button>
                                 <button type="button" class="btn cbi-button cbi-button-reset" 
-                                        onclick="capture_remove('all')" style="flex: 1;">
+                                        onclick="removeAll()" style="flex: 1;">
                                     <%:删除全部%>
                                 </button>
                             </div>
@@ -480,19 +481,19 @@
             action_cell.innerHTML = 
                 '<div style="display: flex; gap: 6px;">' +
                 '  <button class="btn cbi-button cbi-button-download" ' +
-                '          onclick="capture_get(\'pcap\', \'' + entries[i].name + '\')" ' +
+                '          onclick="downloadCapture(\'pcap\', \'' + entries[i].name + '\')" ' +
                 '          style="flex: 1; padding: 5px 8px; font-size: 12px;">' +
                 '    .pcap' +
                 '  </button>' +
                 '  <button class="btn cbi-button cbi-button-action" ' +
-                '          onclick="capture_get(\'filter\', \'' + entries[i].name + '\')" ' +
+                '          onclick="downloadCapture(\'filter\', \'' + entries[i].name + '\')" ' +
                 '          ' + (entries[i].filter ? '' : 'disabled ') +
                 '          style="flex: 1; padding: 5px 8px; font-size: 12px;">' +
                 '    过滤器' +
                 '  </button>' +
                 '  <button class="btn cbi-button cbi-button-remove" ' +
-                '          onclick="capture_remove(\'' + entries[i].name + '\')" ' +
-                '          style="flex: 1; padding: 5px 8px; font-size: 12px;">' +
+                '          onclick="removeCapture(\'' + entries[i].name + '\')" ' +
+                '          style="flex: 1; padding: 5px 8px; font-size: 12px; background: #f44336; color: white; border-color: #d32f2f;">' +
                 '    删除' +
                 '  </button>' +
                 '</div>';
@@ -567,7 +568,7 @@
     }
     
     // 下载文件
-    function capture_get(type, cap_name) {
+    function downloadCapture(type, cap_name) {
         var iframe = document.getElementById("hiddenDownloader");
         if (!iframe) {
             iframe = document.createElement('iframe');
@@ -580,9 +581,14 @@
                      (cap_name ? encodeURIComponent(cap_name) : '');
     }
     
+    // 下载全部文件
+    function downloadAll() {
+        downloadCapture('all', '');
+    }
+    
     // 删除文件
-    function capture_remove(cap_name) {
-        if (confirm('确定要删除' + (cap_name === 'all' ? '所有捕获文件' : '选中的文件') + '吗？')) {
+    function removeCapture(cap_name) {
+        if (confirm('确定要删除"' + cap_name + '.pcap"文件吗？')) {
             XHR.get('<%=luci.dispatcher.build_url("admin", "network", "tcpdump")%>/capture_remove/' + 
                     encodeURIComponent(cap_name), 
                     null, 
@@ -590,6 +596,69 @@
             );
         }
     }
+    
+    // 删除全部文件
+    function removeAll() {
+        if (confirm('确定要删除所有捕获文件吗？此操作不可撤销。')) {
+            XHR.get('<%=luci.dispatcher.build_url("admin", "network", "tcpdump")%>/capture_remove/all', 
+                    null, 
+                    update_callback
+            );
+        }
+    }
+    
+    // 显示提示消息
+    function showToast(message, type) {
+        // 移除现有提示
+        var existingToast = document.getElementById('tcpdump-toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+        
+        // 创建新提示
+        var toast = document.createElement('div');
+        toast.id = 'tcpdump-toast';
+        toast.style.cssText = 
+            'position: fixed; bottom: 20px; right: 20px; ' +
+            'padding: 12px 20px; border-radius: 4px; ' +
+            'color: white; font-weight: 500; ' +
+            'box-shadow: 0 4px 12px rgba(0,0,0,0.15); ' +
+            'z-index: 10000; animation: fadeInOut 3s ease-in-out;';
+        
+        // 根据类型设置颜色
+        switch(type) {
+            case 'success':
+                toast.style.background = '#4caf50';
+                break;
+            case 'error':
+                toast.style.background = '#f44336';
+                break;
+            case 'warning':
+                toast.style.background = '#ff9800';
+                break;
+            case 'info':
+            default:
+                toast.style.background = '#2196f3';
+                break;
+        }
+        
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        // 3秒后自动移除
+        setTimeout(function() {
+            if (toast.parentNode) {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(function() {
+                    if (toast.parentNode) {
+                        toast.remove();
+                    }
+                }, 300);
+            }
+        }, 3000);
+    }
 //]]>
 </script>
+
 <%+footer%>
