@@ -6,7 +6,6 @@
         在此页面启动tcpdump抓包进程，并管理已捕获的数据包文件(.pcap)。捕获的文件存储在临时文件系统中，重启后会丢失。适用于OpenWrt24.10.
     </div>
 
-    <!-- <%-- 动态状态显示区域 --%> -->
     <script type="text/javascript">//<![CDATA[
         XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "network", "tcpdump")%>/update', null,
             function(x, status) {
@@ -27,7 +26,7 @@
         <p id="tcpdump_status"><br><em style="color:blue">⏸️ 抓包已停止</em></p>
     </fieldset>
 
-    <!-- <%-- 抓包控制面板 --%> -->
+
     <fieldset class="cbi-section">
         <legend><%:启动新的抓包任务%></legend>
         <div class="cbi-section-descr" style="margin-bottom: 20px;">
@@ -35,7 +34,6 @@
         </div>
         
         <div class="cbi-section-node">
-            <!-- <%-- 网络接口设置 --%> -->
             <div class="cbi-value">
                 <label class="cbi-value-title" for="cap_ifname"><%:网络接口%></label>
                 <div class="cbi-value-field">
@@ -60,7 +58,6 @@
                 </div>
             </div>
             
-            <!-- <%-- 停止条件设置 --%> -->
             <div class="cbi-value">
                 <label class="cbi-value-title" for="cap_stop_value"><%:停止条件%></label>
                 <div class="cbi-value-field">
@@ -82,7 +79,6 @@
                 </div>
             </div>
             
-            <!-- <%-- BPF过滤规则设置 --%> -->
             <div class="cbi-value">
                 <label class="cbi-value-title" for="cap_filter"><%:BPF过滤规则%></label>
                 <div class="cbi-value-field">
@@ -101,7 +97,6 @@
                 </div>
             </div>
             
-            <!-- <%-- 操作按钮区域 --%> -->
             <div class="cbi-value cbi-value-last">
                 <div class="cbi-value-field">
                     <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px;">
@@ -143,7 +138,6 @@
         </div>
     </fieldset>
 
-    <!-- <%-- 实时输出日志 (仅在抓包时显示) --%> -->
     <fieldset class="cbi-section" id="log_section" style="display:none;">
         <legend><%:实时抓包日志%></legend>
         <div class="cbi-section-node">
@@ -193,7 +187,6 @@
 
     <hr />
 
-    <!-- <%-- 捕获文件列表--%> -->
     <fieldset class="cbi-section">
         <legend><%:已保存的捕获文件%></legend>
         <div class="cbi-section-descr">
