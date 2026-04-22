@@ -316,25 +316,52 @@ function pump_file(file, mime_str)
 end
 
 function capture_get(file_type, cap_name)
-	if file_type == "all" then
-		local system = require "luci.controller.admin.system"
-		local tar_captures_cmd = "tar -c " .. tcpdump_cap_folder ..
-									 "*.pcap 2>/dev/null"
-		local reader = system.ltn12_popen(tar_captures_cmd)
-		luci.http.header('Content-Disposition',
-						 'attachment; filename="captures-%s.tar"' %
-							 {os.date("%Y-%m-%d_%H.%M.%S")})
-		luci.http.prepare_content("application/x-tar")
-		luci.ltn12.pump.all(reader, luci.http.write)
-	elseif file_type == "pcap" then
-		local file = tcpdump_cap_folder .. cap_name .. '.pcap'
-		pump_file(file)
-	elseif file_type == "filter" then
-		local file = tcpdump_filter_folder .. cap_name .. '.filter'
-		pump_file(file, "text/plain")
-	else
-		-- TODO
-	end
+    local fs = require "nixio.fs"
+    local http = require "luci.http"
+    
+    if file_type == "all" then
+        -- 打包下载所有文件
+        local tmp_tar = "/tmp/captures-all.tar"
+        os.execute(string.format("tar -cf %s -C %s . 2>/dev/null", tmp_tar, tcpdump_cap_folder))
+        
+        http.header('Content-Disposition', 'attachment; filename="captures-%s.tar"' % {os.date("%Y-%m-%d_%H.%M.%S")})
+        http.prepare_content("application/x-tar")
+        
+        local fd = nixio.fs.open(tmp_tar, "r")
+        if fd then
+            http.write(fd:read(4096))
+            fd:close()
+        end
+        nixio.fs.remove(tmp_tar)
+        
+    elseif file_type == "pcap" then
+        -- 下载单个pcap文件
+        local file = tcpdump_cap_folder .. cap_name .. '.pcap'
+        if fs.stat(file) then
+            http.header('Content-Disposition', 'attachment; filename="' .. cap_name .. '.pcap"')
+            http.prepare_content("application/vnd.tcpdump.pcap")
+            local fd = io.open(file, "rb")
+            if fd then
+                http.write(fd:read("*a"))
+                fd:close()
+            end
+        end
+        
+    elseif file_type == "filter" then
+        -- 下载过滤器文件
+        local file = tcpdump_filter_folder .. cap_name .. '.filter'
+        if fs.stat(file) then
+            http.header('Content-Disposition', 'attachment; filename="' .. cap_name .. '.filter.txt"')
+            http.prepare_content("text/plain")
+            local fd = io.open(file, "r")
+            if fd then
+                http.write(fd:read("*a"))
+                fd:close()
+            end
+        end
+    else
+        http.status(404, "Not Found")
+    end
 end
 
 function capture_remove(cap_name)
