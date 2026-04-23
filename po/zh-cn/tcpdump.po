@@ -132,8 +132,8 @@ msgstr "Network Packet Capture Tool (Tcpdump)"
 msgid "抓包状态"
 msgstr "Capture Status"
 
-msgid "启动新的抓包任务"
-msgstr "Start New Capture Task"
+msgid "抓包参数设置"
+msgstr "Packet Capture Configuration"
 
 msgid "网络接口"
 msgstr "Network Interface"
@@ -141,7 +141,7 @@ msgstr "Network Interface"
 msgid "停止条件"
 msgstr "Stop Condition"
 
-msgid "数据包数量后停止"
+msgid "数据包后停止"
 msgstr "Stop after packet count"
 
 msgid "秒后停止"
@@ -171,8 +171,8 @@ msgstr "Status"
 msgid "清空日志"
 msgstr "Clear Log"
 
-msgid "已保存的捕获文件"
-msgstr "Saved Capture Files"
+msgid "捕获文件"
+msgstr "Capture Files"
 
 msgid "文件名"
 msgstr "File Name"
